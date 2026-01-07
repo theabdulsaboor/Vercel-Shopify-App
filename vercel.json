@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "routes": [
+      {
+        "src": "/api/create-draft-order",
+        "methods": ["POST", "OPTIONS"],
+        "dest": "/api/create-draft-order.js"
+      }
+    ],
+    "functions": {
+      "api/create-draft-order.js": {
+        "memory": 128,
+        "maxDuration": 10
+      }
+    }
+  }

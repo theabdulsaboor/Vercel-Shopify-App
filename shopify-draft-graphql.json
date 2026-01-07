@@ -1,0 +1,14 @@
+{
+    "query": "mutation draftOrderCreate($input: DraftOrderInput!) { draftOrderCreate(input: $input) { draftOrder { id invoiceUrl } userErrors { field message } } }",
+    "variables": {
+      "input": {
+        "lineItems": [
+          {
+            "variantId": "gid://shopify/ProductVariant/51483147174185",
+            "quantity": 2
+          }
+        ]
+      }
+    }
+  }
+  
