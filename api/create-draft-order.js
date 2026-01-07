@@ -27,13 +27,15 @@ module.exports = async (req, res) => {
           quantity: parseInt(i.quantity, 10)
         };
 
-        // Add priceOverride when price is provided (for per-meter products and custom pricing)
-        if (i.price !== null && i.price !== undefined && i.price > 0) {
+        // Only add priceOverride for per-meter products (when price is explicitly provided and > 0)
+        // Normal products should use their variant's default price (no priceOverride)
+        if (i.price !== null && i.price !== undefined && parseFloat(i.price) > 0) {
           li.priceOverride = {
             amount: parseFloat(i.price).toFixed(2), 
             currencyCode: process.env.SHOPIFY_CURRENCY || "PKR"
           };
         }
+        // If price is null/undefined/0, don't add priceOverride - Shopify will use variant's default price
         return li;
       }
 
