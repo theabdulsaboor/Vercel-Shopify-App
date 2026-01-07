@@ -20,6 +20,9 @@ module.exports = async (req, res) => {
     const shopifyDomain = `${process.env.SHOPIFY_STORE_NAME}.myshopify.com`;
 
     const lineItems = items.map(i => {
+      // Log each item for debugging
+      console.log("Processing item:", JSON.stringify(i, null, 2));
+      
       // Normal product variant line
       if (!i.isCustom) {
         const li = {
@@ -27,15 +30,26 @@ module.exports = async (req, res) => {
           quantity: parseInt(i.quantity, 10)
         };
 
-        // Only add priceOverride for per-meter products (when price is explicitly provided and > 0)
-        // Normal products should use their variant's default price (no priceOverride)
-        if (i.price !== null && i.price !== undefined && parseFloat(i.price) > 0) {
+        // Only add priceOverride for per-meter products
+        // Check if price exists, is a number, and is greater than 0
+        const hasValidPrice = i.hasOwnProperty('price') && 
+                              i.price !== null && 
+                              i.price !== undefined && 
+                              !isNaN(parseFloat(i.price)) && 
+                              parseFloat(i.price) > 0;
+        
+        console.log("Item variantId:", i.variantId, "hasValidPrice:", hasValidPrice, "price value:", i.price);
+        
+        if (hasValidPrice) {
           li.priceOverride = {
             amount: parseFloat(i.price).toFixed(2), 
             currencyCode: process.env.SHOPIFY_CURRENCY || "PKR"
           };
+          console.log("Added priceOverride:", li.priceOverride);
+        } else {
+          console.log("No priceOverride - using variant's default price");
         }
-        // If price is null/undefined/0, don't add priceOverride - Shopify will use variant's default price
+        
         return li;
       }
 
