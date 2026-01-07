@@ -30,24 +30,31 @@ module.exports = async (req, res) => {
           quantity: parseInt(i.quantity, 10)
         };
 
-        // Only add priceOverride for per-meter products
-        // Check if price exists, is a number, and is greater than 0
-        const hasValidPrice = i.hasOwnProperty('price') && 
-                              i.price !== null && 
-                              i.price !== undefined && 
-                              !isNaN(parseFloat(i.price)) && 
-                              parseFloat(i.price) > 0;
+        // Only add priceOverride for per-meter products (when price is explicitly provided and > 0)
+        // Normal products should NOT have priceOverride - Shopify will use variant's default price
+        // Only add priceOverride if:
+        // 1. price property exists AND
+        // 2. price is not null/undefined AND  
+        // 3. price is a valid number AND
+        // 4. price is greater than 0
+        const priceValue = i.price;
+        const hasValidPrice = typeof priceValue !== 'undefined' &&
+                              priceValue !== null &&
+                              priceValue !== '' &&
+                              !isNaN(parseFloat(priceValue)) && 
+                              parseFloat(priceValue) > 0;
         
-        console.log("Item variantId:", i.variantId, "hasValidPrice:", hasValidPrice, "price value:", i.price);
+        console.log("Item variantId:", i.variantId, "hasValidPrice:", hasValidPrice, "price value:", priceValue, "hasOwnProperty:", i.hasOwnProperty('price'));
         
         if (hasValidPrice) {
           li.priceOverride = {
-            amount: parseFloat(i.price).toFixed(2), 
+            amount: parseFloat(priceValue).toFixed(2), 
             currencyCode: process.env.SHOPIFY_CURRENCY || "PKR"
           };
           console.log("Added priceOverride:", li.priceOverride);
         } else {
-          console.log("No priceOverride - using variant's default price");
+          console.log("No priceOverride - using variant's default price (priceValue:", priceValue, ")");
+          // Explicitly do NOT add priceOverride - Shopify will use variant's default price
         }
         
         return li;
