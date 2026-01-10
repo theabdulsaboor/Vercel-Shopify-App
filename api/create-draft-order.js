@@ -30,6 +30,16 @@ module.exports = async (req, res) => {
           quantity: parseInt(i.quantity, 10)
         };
 
+        // ADD: Convert properties to customAttributes format
+      if (i.properties && Object.keys(i.properties).length > 0) {
+        li.customAttributes = Object.entries(i.properties)
+          .filter(([key, value]) => value !== null && value !== undefined && value !== '')
+          .map(([key, value]) => ({
+            key: key,
+            value: String(value)
+          }));
+      }
+
         // Only add priceOverride for per-meter products (when price is explicitly provided and > 0)
         // Normal products should NOT have priceOverride - Shopify will use variant's default price
         // Only add priceOverride if:
@@ -69,6 +79,17 @@ module.exports = async (req, res) => {
           currencyCode: process.env.SHOPIFY_CURRENCY || "PKR"
         }
       };
+
+      if (i.properties && Object.keys(i.properties).length > 0) {
+        customItem.customAttributes = Object.entries(i.properties)
+          .filter(([key, value]) => value !== null && value !== undefined && value !== '')
+          .map(([key, value]) => ({
+            key: key,
+            value: String(value)
+          }));
+      }
+    
+      return customItem;
     });
 
     const query = `
@@ -133,3 +154,4 @@ module.exports = async (req, res) => {
     });
   }
 };
+
