@@ -31,9 +31,17 @@ module.exports = async (req, res) => {
         };
 
         // ADD: Convert properties to customAttributes format
+      // Around line 35
       if (i.properties && Object.keys(i.properties).length > 0) {
         li.customAttributes = Object.entries(i.properties)
-          .filter(([key, value]) => value !== null && value !== undefined && value !== '')
+          .filter(([key, value]) => {
+            // Filter out null/undefined/empty values AND hide UnitPrice and Total_Price
+            return value !== null && 
+                   value !== undefined && 
+                   value !== '' &&
+                   key !== 'UnitPrice' &&
+                   key !== 'Total_Price';
+          })
           .map(([key, value]) => ({
             key: key,
             value: String(value)
@@ -80,9 +88,17 @@ module.exports = async (req, res) => {
         }
       };
 
+      // Around line 84
       if (i.properties && Object.keys(i.properties).length > 0) {
         customItem.customAttributes = Object.entries(i.properties)
-          .filter(([key, value]) => value !== null && value !== undefined && value !== '')
+          .filter(([key, value]) => {
+            // Filter out null/undefined/empty values AND hide UnitPrice and Total_Price
+            return value !== null && 
+                   value !== undefined && 
+                   value !== '' &&
+                   key !== 'UnitPrice' &&
+                   key !== 'Total_Price';
+          })
           .map(([key, value]) => ({
             key: key,
             value: String(value)
@@ -154,4 +170,5 @@ module.exports = async (req, res) => {
     });
   }
 };
+
 
